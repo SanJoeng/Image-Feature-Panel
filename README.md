@@ -49,6 +49,9 @@ streamlit run app.py
 
 浏览器自动打开 `http://localhost:8501` 后，在左侧侧边栏上传图片即可开始分析。
 
+<img width="3000" height="2250" alt="forensic_report-4" src="https://github.com/user-attachments/assets/47f23383-6511-423e-9dfe-076d2fffec21" />
+
+
 ## 📊 特征参考简表
 
 | 特征维度 | 📸 真实照片倾向 | 🤖 AI生成/伪造倾向 |
