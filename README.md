@@ -2,6 +2,7 @@
 
 这是一个轻量级的图像特征可视化工具，基于 Streamlit 开发。它通过提取图像的频域、信号层和物理层特征，辅助用户判断图片是相机直出还是 AI 生成/后期合成。
 
+  🔗 在线演示 (Live Demo): [image-feature-panel.streamlit.app](https://image-feature-panel.streamlit.app)
 
 ![图层 5](https://github.com/user-attachments/assets/7fb651ba-7681-44b1-9297-d05132b16a4f)
 <img width="3000" height="2250" alt="forensic_report-4" src="https://github.com/user-attachments/assets/47f23383-6511-423e-9dfe-076d2fffec21" />
