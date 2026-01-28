@@ -4,21 +4,17 @@
 
 
 ![图层 5](https://github.com/user-attachments/assets/7fb651ba-7681-44b1-9297-d05132b16a4f)
-![图层 4](https://github.com/user-attachments/assets/7e3e9dc9-2e01-4f6f-a342-daa60c205d52)
-![图层 3](https://github.com/user-attachments/assets/a9eaa61b-1621-42b6-a85f-e82909d9b0f2)
-![图层 2](https://github.com/user-attachments/assets/742beadf-1ba5-4667-be78-df9268af2aa4)
-![图层 1](https://github.com/user-attachments/assets/38b60d42-fc9f-4894-a3fb-80594a1486b9)
+<img width="3000" height="2250" alt="forensic_report-4" src="https://github.com/user-attachments/assets/47f23383-6511-423e-9dfe-076d2fffec21" />
 
 ## 📦 功能列表
 
 * **元数据检测**: 自动提取 EXIF 信息及隐藏的 AI 生成参数 (支持 Stable Diffusion, Midjourney, NovelAI 等)。
 * **频域分析 (FFT)**: 2D 频谱图与径向能量衰减曲线，用于检测网格效应和异常高频信号。
-* **信号分析**:
+
 * **ELA (误差水平分析)**: 检测重压缩差异和拼接痕迹。
 * **噪声残差**: 分离图像内容，查看底层传感器噪声分布。
 
 
-* **物理特征**:
 * **光照梯度**: 可视化光照方向，检查光影逻辑一致性。
 * **色差**: 检测镜头边缘的紫边/色散现象。
 * **饱和度**: 阴影区域的饱和度热力图。
@@ -49,8 +45,10 @@ streamlit run app.py
 
 浏览器自动打开 `http://localhost:8501` 后，在左侧侧边栏上传图片即可开始分析。
 
-<img width="3000" height="2250" alt="forensic_report-4" src="https://github.com/user-attachments/assets/47f23383-6511-423e-9dfe-076d2fffec21" />
-
+![图层 4](https://github.com/user-attachments/assets/7e3e9dc9-2e01-4f6f-a342-daa60c205d52)
+![图层 3](https://github.com/user-attachments/assets/a9eaa61b-1621-42b6-a85f-e82909d9b0f2)
+![图层 2](https://github.com/user-attachments/assets/742beadf-1ba5-4667-be78-df9268af2aa4)
+![图层 1](https://github.com/user-attachments/assets/38b60d42-fc9f-4894-a3fb-80594a1486b9)
 
 ## 📊 特征参考简表
 
