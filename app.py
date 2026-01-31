@@ -8,16 +8,16 @@ import matplotlib.colors as mcolors
 from PIL import Image, ImageChops, ImageEnhance, ImageFilter, ExifTags
 
 # ==========================================
-# 0. 依赖检查
+# 0. Dependency Check
 # ==========================================
 try:
     from streamlit_image_coordinates import streamlit_image_coordinates
 except ImportError:
-    st.error("请先安装点击交互库: pip install streamlit-image-coordinates")
+    st.error("Please install the click interaction package first: pip install streamlit-image-coordinates")
     st.stop()
 
 # ==========================================
-# 1. 核心算法: 特征提取
+# 1. Core Algorithms: Feature Extraction
 # ==========================================
 
 def img_to_float01(pil_img):
@@ -33,7 +33,7 @@ def normalize_to_display(img_data):
         return np.zeros_like(img_data)
     return (img_data - d_min) / (d_max - d_min)
 
-# --- A. 频域分析 ---
+# --- A. Frequency Analysis ---
 def compute_fft(gray_img):
     f = np.fft.fft2(gray_img)
     fshift = np.fft.fftshift(f)
@@ -50,7 +50,7 @@ def compute_radial_profile(fft_mag):
     radial_profile = tbin / np.maximum(nr, 1)
     return radial_profile[:min(cx, cy)]
 
-# --- B. 信号分析 ---
+# --- B. Signal Analysis ---
 def compute_ela(pil_img, quality=90):
     pil_img = pil_img.convert('RGB')
     buf = io.BytesIO()
@@ -74,7 +74,7 @@ def compute_noise_residual(rgb01, blur_radius=1.5):
     p99 = np.percentile(diff_gray, 99.5)
     return np.clip(diff_gray / (p99 + 1e-6), 0, 1)
 
-# --- C. 物理分析 ---
+# --- C. Physical Analysis ---
 def compute_chromatic_aberration(rgb01):
     r = rgb01[..., 0]
     b = rgb01[..., 2]
@@ -124,7 +124,7 @@ def compute_illumination_map(rgb01):
     rgb_map = mcolors.hsv_to_rgb(hsv)
     return rgb_map
 
-# --- D. 元数据深度挖掘 ---
+# --- D. Metadata Mining ---
 def get_ai_generation_info(pil_img):
     info_dict = {}
     if pil_img.info:
@@ -150,7 +150,7 @@ def get_ai_generation_info(pil_img):
     except: pass
     return info_dict
 
-# --- E. Dashboard 导出绘制 (English Titles) ---
+# --- E. Dashboard Export (English Titles) ---
 def generate_dashboard_figure(pil_img, img_np, img_gray, ela_img, quality, blur):
     fig = plt.figure(figsize=(20, 15), facecolor='white')
     
@@ -244,28 +244,28 @@ def generate_dashboard_figure(pil_img, img_np, img_gray, ela_img, quality, blur)
     return buf
 
 # ==========================================
-# 2. UI 主程序
+# 2. UI Main Program
 # ==========================================
 
-st.set_page_config(layout="wide", page_title="AI 影像取证台")
+st.set_page_config(layout="wide", page_title="AI Image Forensics")
 
-# --- 侧边栏 ---
+# --- Sidebar ---
 with st.sidebar:
-    st.header("🎛️ 分析控制台")
-    uploaded_file = st.file_uploader("📂 导入图片", type=['jpg','jpeg','png','webp','tiff'])
+    st.header("🎛️ Analysis Console")
+    uploaded_file = st.file_uploader("📂 Upload Image", type=['jpg','jpeg','png','webp','tiff'])
     st.divider()
-    st.subheader("参数微调")
-    ela_quality = st.slider("ELA 压缩质量", 50, 99, 90)
-    blur_radius = st.slider("噪点分离半径", 0.5, 5.0, 1.5)
-    st.info("提示：Tab 5 可使用显微镜功能")
+    st.subheader("Parameter Tuning")
+    ela_quality = st.slider("ELA Compression Quality", 50, 99, 90)
+    blur_radius = st.slider("Noise Separation Radius", 0.5, 5.0, 1.5)
+    st.info("Tip: Use the Microscope tab to inspect details.")
 
-st.title("🕵️‍♂️ AI 影像取证")
+st.title("🕵️‍♂️ AI Image Forensics")
 
 if not uploaded_file:
-    st.warning("👈 请先在左侧导入图片以开始工作流。")
+    st.warning("👈 Please upload an image from the left panel to start.")
     st.stop()
 
-# --- 数据预处理 ---
+# --- Preprocessing ---
 pil_img = Image.open(uploaded_file).convert('RGB')
 w_orig, h_orig = pil_img.size
 
@@ -279,38 +279,38 @@ fft_res = compute_fft(img_gray)
 ela_res = compute_ela(pil_small, ela_quality)
 noise_res = compute_noise_residual(img_np, blur_radius)
 
-# --- 导出 ---
+# --- Export ---
 col_title, col_export = st.columns([5, 1])
 with col_export:
-    if st.button("📸 导出报告(PNG)"):
-        with st.spinner("生成 Dashboard..."):
+    if st.button("📸 Export Report (PNG)"):
+        with st.spinner("Generating dashboard..."):
             dash_bytes = generate_dashboard_figure(pil_small, img_np, img_gray, ela_res, ela_quality, blur_radius)
-            st.download_button("⬇️ 下载", dash_bytes, "forensic_report.png", "image/png")
+            st.download_button("⬇️ Download", dash_bytes, "forensic_report.png", "image/png")
 
 # --- Tabs ---
 tab_meta, tab_freq, tab_signal, tab_physics, tab_micro = st.tabs([
-    "📂 元数据侦测", "📈 频域 (FFT)", "📶 信号 (ELA/Noise)", "🌈 物理 (光照/色差)", "🔬 显微镜"
+    "📂 Metadata", "📈 Frequency (FFT)", "📶 Signal (ELA/Noise)", "🌈 Physics (Light/CA)", "🔬 Microscope"
 ])
 
-# 1. 元数据
+# 1. Metadata
 with tab_meta:
     c1, c2 = st.columns([3, 2])
-    c1.image(pil_img, caption=f"分辨率: {w_orig}x{h_orig}", use_container_width=True)
+    c1.image(pil_img, caption=f"Resolution: {w_orig}x{h_orig}", use_container_width=True)
     with c2:
-        st.subheader("🕵️‍♂️ 隐藏参数")
+        st.subheader("🕵️‍♂️ Hidden Parameters")
         ai_info = get_ai_generation_info(pil_img)
         if ai_info:
-            st.error("🚨 发现疑似 AI 生成配置信息！(Smoking Gun)")
+            st.error("🚨 Suspected AI generation metadata found! (Smoking Gun)")
             for k, v in ai_info.items():
                 with st.expander(f"📌 {k}", expanded=True):
                     st.code(v, language='text')
-            st.caption("🔍 解读：如果这里出现了 Prompts, Seed 或 Steps，这几乎是 100% 的 AI 直出图证据。这是最直接的判定方式。")
+            st.caption("🔍 If you see Prompts/Seed/Steps here, it's almost certain the image is AI-generated.")
         else:
-            st.success("✅ 未在文件头中发现明文 AI 参数")
-            st.caption("注意：这不代表不是 AI。可能是生成后经过了 PS 转存、微信发送或专门的 Metadata 清洗。")
+            st.success("✅ No explicit AI parameters found in the file header.")
+            st.caption("Note: This does not prove the image is genuine. Metadata can be stripped or re-saved.")
         
         st.divider()
-        st.subheader("📷 标准 EXIF")
+        st.subheader("📷 Standard EXIF")
         exif_data = {}
         try:
             info = pil_img.getexif()
@@ -322,27 +322,27 @@ with tab_meta:
                     exif_data[decoded] = value
                 st.dataframe(exif_data, use_container_width=True, height=400)
             else:
-                st.warning("⚠️ 无 EXIF 数据")
-                st.caption("真实相机拍摄的原始照片通常会包含光圈、快门、ISO 等信息。如果 EXIF  полностью为空，可疑度增加。")
-        except: st.error("无法读取 EXIF")
+                st.warning("⚠️ No EXIF data found")
+                st.caption("Camera originals usually include aperture/shutter/ISO. Empty EXIF increases suspicion.")
+        except: st.error("Failed to read EXIF")
 
-# 2. 频域
+# 2. Frequency Domain
 with tab_freq:
     st.info("""
-    **📊 判读指南：**
-    * **ℹ️ 关于“十字亮线”**：
-        * 注意：你会在几乎所有图片（无论是实拍还是 AI）的中心看到明亮的十字线。
-        * **这是正常的数学现象**（边缘频谱泄露），**不是**判断 AI 的依据，请忽略它，观察十字线以外的区域。
-    * **✅ 真图特征**：
-        * 十字线以外的区域，能量像云雾一样从中心向四周**平滑、随机地衰减**。
-        * 没有突兀的亮点或几何规律。
-    * **🚨 AI 伪影 (Smoking Gun)**：
-        1.  **异常星点 (Artifact Dots)**：在远离中心的暗色背景中，出现**孤立的、不对称的明亮白点**（这是最强的 AI 特征）。
-        2.  **规则网格 (Grids)**：仔细观察云雾背景，若隐若现地覆盖着像“棋盘”或“方格纸”一样的点阵结构。
-        *原理：这是卷积神经网络 (CNN) 在上采样 (Upsampling) 生成图像时留下的周期性指纹。*
+    **📊 Reading Guide:**
+    * **ℹ️ About the bright cross**:
+        * Almost every image (real or AI) shows a bright cross at the center.
+        * **This is normal** spectral leakage, **not** an AI cue. Focus on areas outside the cross.
+    * **✅ Genuine photos**:
+        * Energy decays smoothly and randomly from center to edges, like fog.
+        * No abrupt bright spots or geometric patterns.
+    * **🚨 AI artifacts (Smoking Gun)**:
+        1. **Isolated bright dots** far from the center on dark background.
+        2. **Regular grids** or checkerboard-like point patterns over the spectrum.
+        *Reason: CNN upsampling leaves periodic fingerprints.*
     """)
     c1, c2 = st.columns(2)
-    c1.image(fft_res, clamp=True, use_container_width=True, caption="2D FFT 频谱 (Log Scale)")
+    c1.image(fft_res, clamp=True, use_container_width=True, caption="2D FFT Spectrum (Log Scale)")
     
     fig_rad, ax = plt.subplots(figsize=(6,3))
     ax.plot(compute_radial_profile(fft_res), color='#ff4b4b', linewidth=2)
@@ -351,30 +351,29 @@ with tab_freq:
     ax.set_ylabel("Power")
     ax.grid(True, alpha=0.3)
     c2.pyplot(fig_rad)
-    c2.caption("🔍 解读：正常曲线应平滑下降。如果在尾部（右侧高频区）突然上翘，说明存在非自然的高频噪声。")
+    c2.caption("🔍 Interpretation: A smooth downward curve is normal. A late upward bump (right side) signals abnormal high-frequency noise.")
 
-# 3. 信号
 with tab_signal:
     st.info("""
-    **📊 判读指南：**
-    * **ELA (误差水平分析)**：
-        * **✅ 真图**：全图噪点分布均匀，像一层薄薄的沙子。复杂纹理（如树叶）处更亮是正常的。
-        * **🚨 拼接/P图**：如果人脸区域的颜色/亮度与背景**截然不同**（例如背景是红噪点，人脸是蓝噪点），说明是后期贴上去的。
-    * **Noise (噪声残差)**：
-        * **✅ 真图**：即使是 ISO 100 的照片，放大看也会有细腻的**光子噪声**（颗粒感）。
-        * **🚨 AI 生成**：往往像“塑料”或“蜡像”一样光滑，或者在头发等细节处出现奇怪的条纹状噪点，缺乏随机性。
+    **📊 Reading Guide:**
+    * **ELA (Error Level Analysis)**:
+        * **✅ Genuine**: Noise evenly distributed like thin sand. Brighter at complex textures (e.g., leaves) is normal.
+        * **🚨 Splicing/Edits**: If face noise/brightness differs sharply from background (e.g., red noise vs blue noise), likely pasted.
+    * **Noise Residual**:
+        * **✅ Genuine**: Fine photon noise even at low ISO.
+        * **🚨 AI**: Plastic/waxy smoothness or odd striped noise in details; lacks randomness.
     """)
     c1, c2 = st.columns(2)
     c1.image(ela_res, use_container_width=True, caption=f"ELA (Quality={ela_quality})")
     c2.image(noise_res, clamp=True, channels='GRAY', use_container_width=True, caption=f"Noise Residual (r={blur_radius})")
 
-# 4. 物理
+# 4. Physics
 with tab_physics:
     st.info("""
-    **📊 判读指南：**
-    * **🌈 光照梯度 (Illumination)**：**颜色代表光照方向**。在平滑的曲面（如人脸、球体）上，颜色应该**平滑过渡**。如果颜色杂乱无章（五颜六色），说明 AI 搞乱了光影逻辑。
-    * **🟣 色差 (Chromatic Aberration)**：真实镜头在画面边缘的高光交界处会有**紫边/绿边**。AI 生成图往往要么**完全没有色差**（全黑，过于完美），要么全图随机乱飞。
-    * **🔥 饱和度 (Saturation)**：检查阴影区域。物理世界的阴影应该是低饱和度的。如果你在黑影里看到了**高饱和度的红色/蓝色杂斑**，这是 Diffusion 模型的典型缺陷。
+    **📊 Reading Guide:**
+    * **🌈 Illumination Gradient**: Colors encode light direction. On smooth surfaces (faces, spheres), colors should transition smoothly. Random colors mean broken lighting logic.
+    * **🟣 Chromatic Aberration**: Real lenses show purple/green edges at highlights. AI often shows none (all black) or random speckles everywhere.
+    * **🔥 Saturation**: Check shadows. Real shadows are low saturation. Bright saturated red/blue speckles in dark areas are typical diffusion artifacts.
     """)
     c1, c2, c3 = st.columns(3)
     
@@ -393,85 +392,70 @@ with tab_physics:
     c3.pyplot(fig_sat)
     c3.caption("Saturation Heatmap (Red=High)")
 
-# 5. 显微镜
+# 5. Microscope
 with tab_micro:
-    st.markdown("#### 🔬 交互式显微镜")
-    st.caption("👈 **操作方法**：在左侧【导航图】上点击任意位置，右侧会显示该区域的高清原图细节。")
+    st.markdown("#### 🔬 Interactive Microscope")
+    st.caption("👈 Click any point on the Navigation panel to inspect that region in high resolution.")
 
     col_nav, col_zoom = st.columns([1, 2])
 
     with col_nav:
-        st.subheader("1. 导航 (点击定位)")
+        st.subheader("1. Navigation (click to locate)")
         
-        # 视窗大小 (View Size)
         crop_size = st.slider(
-            "🔎 视窗范围 (像素)",
+            "🔎 View Window (px)",
             min_value=50, max_value=1200, value=400, step=50,
-            help="数值越大，视野越广（倍率越低）；数值越小，倍率越高。"
+            help="Larger value = wider view (lower magnification); smaller = higher magnification."
         )
 
-        # === 修复核心：使用 thumbnail 缩略图模式 ===
-        # 不再强制 resize 到固定宽度，而是限制在 350x350 的框内
-        # 这样无论是长图还是宽图，都能完整显示，不会被截断
-        
-        # 1. 复制一个用于显示的副本
+        # Use thumbnail mode to preserve aspect ratio within 350x350 box
+        # Copy for display
         pil_nav = pil_img.copy()
         
-        # 2. 生成缩略图 (原地修改 pil_nav，保持比例)
-        # 350 是侧边栏/分栏通常的安全宽度
+        # Generate thumbnail (in-place, keep ratio)
         pil_nav.thumbnail((350, 350), Image.Resampling.LANCZOS)
         
-        # 3. 获取缩略图的实际尺寸
         nav_w, nav_h = pil_nav.size
         
-        # 4. 显示导航图 (注意：这里不要传 width 参数，让组件自己适应图片)
         coords = streamlit_image_coordinates(
             pil_nav,
             key="zoom_click"
         )
 
-        # 5. 坐标映射逻辑 (根据缩略图和原图的比例反算)
         if coords:
-            # 算出缩放比例
             scale_x = w_orig / nav_w
             scale_y = h_orig / nav_h
             
-            # 反算回原图坐标
             center_x = int(coords['x'] * scale_x)
             center_y = int(coords['y'] * scale_y)
         else:
             center_x = w_orig // 2
             center_y = h_orig // 2
 
-        st.info(f"原图坐标: ({center_x}, {center_y})")
+        st.info(f"Original coordinates: ({center_x}, {center_y})")
 
     with col_zoom:
-        st.subheader("2. 细节 (高清原图)")
+        st.subheader("2. Detail (hi-res crop)")
 
-        # 边界保护 (防止超出图片范围)
         half_size = crop_size // 2
         x0 = max(0, center_x - half_size)
         y0 = max(0, center_y - half_size)
         x1 = min(w_orig, center_x + half_size)
         y1 = min(h_orig, center_y + half_size)
 
-        # 裁剪原图
         crop_img = pil_img.crop((x0, y0, x1, y1))
         
-        # 显示裁剪图 (使用 use_container_width 撑满右侧区域)
         st.image(crop_img, use_container_width=True)
 
-        # 局部 FFT 分析
-        with st.expander("查看该区域的 FFT 特征 (排除背景干扰)", expanded=True):
-            # 实时计算
+        # Local FFT analysis
+        with st.expander("View FFT of this region (exclude background influence)", expanded=True):
             crop_np = img_to_float01(crop_img)
             crop_gray_small = rgb_to_gray(crop_np)
             crop_fft = compute_fft(crop_gray_small)
             
-            # 显示 FFT (use_container_width=True 保证图不会忽大忽小)
             st.image(
                 crop_fft,
                 clamp=True,
-                caption="局部 FFT 频谱",
+                caption="Local FFT spectrum",
                 use_container_width=True
             )
